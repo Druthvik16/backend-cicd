@@ -13,14 +13,12 @@ echo "========================================="
 cd $APP_DIR
 
 # ----- Smart install: only run if package.json changed -----
-# During CodeBuild the repo is freshly cloned so we compare
-# the hash of package.json against a cached hash file.
 HASH_FILE="/home/ubuntu/.pkg_hash"
 CURRENT_HASH=$(md5sum package.json | awk '{ print $1 }')
 
 if [ ! -f "$HASH_FILE" ] || [ "$(cat $HASH_FILE)" != "$CURRENT_HASH" ]; then
   echo "📦 package.json changed — running npm install..."
-  npm install --production
+  npm install
   echo "$CURRENT_HASH" > "$HASH_FILE"
   echo "✅ npm install done"
 else
@@ -29,7 +27,7 @@ fi
 
 # ----- Build TypeScript -----
 echo "🔨 Building TypeScript..."
-npm run build
+./node_modules/.bin/tsc
 echo "✅ Build complete"
 
 # ----- PM2: start or restart -----
